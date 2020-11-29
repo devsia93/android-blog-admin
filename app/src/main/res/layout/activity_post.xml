@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context=".ActivityPost">
+    tools:context=".activities.ActivityPost">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,17 +12,14 @@
         android:orientation="vertical">
 
         <include
-            android:id="@+id/layout_post_content_view"
             layout="@layout/layout_post_content_view"
             android:isScrollContainer="true" />
 
         <include
-            android:id="@+id/layout_tags_content_view"
             layout="@layout/layout_tags_content_view"
             android:isScrollContainer="true" />
 
         <include
-            android:id="@+id/layout_tags_content_view"
             layout="@layout/layout_comment"
             android:isScrollContainer="true" />
 
