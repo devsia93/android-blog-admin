@@ -9,19 +9,33 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical">
 
-        <include
-            layout="@layout/layout_post_content_view"
-            android:isScrollContainer="true" />
+        <include layout="@layout/layout_post_content_view" />
 
         <include
+            android:id="@+id/activity_post"
             layout="@layout/layout_tags_content_view"
-            android:isScrollContainer="true" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/comments"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <include
             layout="@layout/layout_comment"
-            android:isScrollContainer="true" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 

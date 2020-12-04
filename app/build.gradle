@@ -3,6 +3,9 @@ plugins {
     id 'kotlin-android'
 }
 
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
+
 android {
     compileSdkVersion 30
 
@@ -57,5 +60,9 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     //https://github.com/dybarsky/spots-dialog
     implementation 'com.github.d-max:spots-dialog:1.1@aar'
+    //room
+    implementation "androidx.room:room-runtime:2.2.5"
+    kapt "androidx.room:room-compiler:2.2.5"
+
 
 }

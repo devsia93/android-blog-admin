@@ -1,57 +1,57 @@
 package com.devsia.blog.activities
 
-import android.app.AlertDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.view.isVisible
 import com.devsia.blog.R
 import com.devsia.blog.`interface`.RetrofitServices
-import com.devsia.blog.adapters.PostListAdapter
 import com.devsia.blog.common.Common
+import com.devsia.blog.helper.Helper
+import com.devsia.blog.models.Comment
 import com.devsia.blog.models.Post
-import dmax.dialog.SpotsDialog
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.devsia.blog.preference.Const
+import com.devsia.blog.preference.PreferenceHelper
+import kotlinx.android.synthetic.main.layout_post_content_view.*
+import kotlinx.android.synthetic.main.layout_tags_content_view.*
 
 class ActivityPost : AppCompatActivity() {
 
-    lateinit var mService: RetrofitServices
-    lateinit var layoutManager: LinearLayoutManager
-    lateinit var adapter: PostListAdapter
-    lateinit var dialog: AlertDialog
-    var recyclerPostList: RecyclerView = findViewById(R.id.main_rv_posts_content)
+    private lateinit var mService: RetrofitServices
+    private lateinit var post: Post
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
 
-        mService = Common.retrofitServices
-//        var recyclerPostList: RecyclerView = findViewById(R.id.main_rv_posts_content)
-        recyclerPostList.layoutManager = layoutManager
-        dialog = SpotsDialog.Builder().setCancelable(true).setContext(this).build()
+        post = intent.extras?.get(Const.Extra.extraPost()) as Post
 
-        getAllPostsList()
+        inflateViews()
     }
 
-    private fun getAllPostsList() {
-        dialog.show()
-        mService.getPostList().enqueue(object : Callback<MutableList<Post>>{
-            override fun onFailure(call: Call<MutableList<Post>>, t: Throwable) {
-                TODO("Not yet implemented")
-            }
+    private fun inflateViews() {
+        post_content_tv_title.text = post.title
+        post_content_tv_body.text = post.body
+        tags_content_main_layout?.isVisible = !post.tags.isNullOrEmpty()
 
-            override fun onResponse(
-                call: Call<MutableList<Post>>,
-                response: Response<MutableList<Post>>
-            ) {
-                adapter = PostListAdapter(baseContext, response.body() as MutableList<Post>)
-                adapter.notifyDataSetChanged()
-                recyclerPostList.adapter = adapter
+        if (!post.tags.isNullOrEmpty()) {
+            val pref = PreferenceHelper(baseContext)
+            val tags = pref.getListTags()
 
-                dialog.dismiss()
+            for (tagId in post.tags!!) {
+                for (tag in tags) {
+                    if (tag.id == tagId)
+                        Helper.createChip(tags_content_fb_view, tag.title)
+                }
             }
-        })
+        }
+
+        if (!post.comments.isNullOrEmpty()) {
+            mService = Common.retrofitServices
+
+            for (commentId in post.comments!!) {
+                val comment: Comment = mService.getCommentById(commentId)
+
+            }
+        }
     }
 }

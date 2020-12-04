@@ -1,10 +1,13 @@
 package com.devsia.blog.models
 
+import java.io.Serializable
+
 data class Post(
-    val body: String,
+    val id: Int,
+    val slug: String,
     val title: String,
-    val tags: List<Tag>? = null,
-    val slug: String?,
+    val body: String,
+    val tags: List<Int>? = null,
     val date_pub: String,
-    val id: Int
-)
+    val comments: List<Int>? = null,
+) : Serializable
