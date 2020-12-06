@@ -14,6 +14,24 @@ class PreferenceHelper(private var context: Context) {
     fun getListTags(): List<Tag> =
         getConvertedObjectArrayListToTagList(getArrayList(Const.savedTags()))
 
+    fun getToken(): String? {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences(Const.savedToken(), Context.MODE_PRIVATE)
+
+        return prefs.getString("token", null)
+    }
+
+    fun setToken(token: String) {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences(Const.savedToken(), Context.MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = prefs.edit()
+        if (token.substring(1, 6) != "Token")
+        editor.putString("token", "Token $token")
+        else
+        editor.putString("token", token)
+
+        editor.apply()
+    }
 
     private fun saveArrayList(list: java.util.ArrayList<Any?>, key: String?) {
         val prefs: SharedPreferences = context.getSharedPreferences(key, Context.MODE_PRIVATE)
@@ -35,8 +53,8 @@ class PreferenceHelper(private var context: Context) {
 
     private fun getConvertedTagListToObjectList(tagList: List<Tag>): ArrayList<Any?> {
         val result = ArrayList<Any?>()
-        for (t in tagList) {
-            result.add(t as Any)
+        for (tag in tagList) {
+            result.add(tag as Any)
         }
 
         return result
@@ -45,8 +63,8 @@ class PreferenceHelper(private var context: Context) {
     private fun getConvertedObjectArrayListToTagList(objectList: ArrayList<Any?>): List<Tag> {
         val result: ArrayList<Tag> = ArrayList()
 
-        for (o in objectList)
-            result.add(o as Tag)
+        for (obj in objectList)
+            result.add(obj as Tag)
 
         return result.toList()
     }

@@ -1,42 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context=".activities.ActivityPost">
+    tools:context=".activities.PostActivity">
 
-    <LinearLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/post.toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:elevation="1dp"
+        android:minHeight="?attr/actionBarSize" />
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/layout_post_content_view" />
-
-        <include
-            android:id="@+id/activity_post"
-            layout="@layout/layout_tags_content_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp" />
-
-        <TextView
+        <LinearLayout
+            android:id="@+id/activity_post.ll_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/comments"
-            android:textSize="16sp"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
 
-        <include
-            layout="@layout/layout_comment"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            <include layout="@layout/layout_post_content_view" />
 
-    </LinearLayout>
+            <include
+                android:id="@+id/activity_post"
+                layout="@layout/layout_tags_content_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp" />
 
-</ScrollView>
+            <TextView
+                android:id="@+id/activity_post.tv_comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/comments"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="16dp"
+                android:descendantFocusability="blocksDescendants"
+                android:paddingBottom="16dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/activity_post.rv_comments"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:nestedScrollingEnabled="false" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

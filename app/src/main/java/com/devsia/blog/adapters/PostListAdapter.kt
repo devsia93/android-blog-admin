@@ -11,7 +11,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.devsia.blog.R
-import com.devsia.blog.activities.ActivityPost
+import com.devsia.blog.activities.PostActivity
+import com.devsia.blog.activities.MainActivity
 import com.devsia.blog.helper.Helper
 import com.devsia.blog.models.Post
 import com.devsia.blog.models.Tag
@@ -35,10 +36,12 @@ class PostListAdapter(
 
         fun bind(listItem: Post) {
             itemView.setOnClickListener {
-                val intent = Intent(it.context, ActivityPost::class.java)
+                val intent = Intent(it.context, PostActivity::class.java)
                 intent.putExtra(Const.Extra.extraPost(), listItem as Serializable)
                 it.context.startActivity(intent)
             }
+
+
         }
     }
 
@@ -68,10 +71,22 @@ class PostListAdapter(
         if (isTagged) {
             val pref = PreferenceHelper(context)
             val tags: List<Tag> = pref.getListTags()
+
             for (tagId in listItem.tags!!) {
                 for (tag in tags) {
-                    if (tag.id == tagId)
-                        Helper.createChip(holder.fbView, tag.title)
+                    if (tag.id == tagId) {
+                        val chip = Helper.getCreatedChip(holder.fbView, tag)
+
+                        if (chip != null) {
+                            holder.fbView.addView(chip)
+
+                            chip.setOnClickListener {
+                                val intent = Intent(it.context, MainActivity::class.java)
+                                intent.putExtra(Const.Extra.extraTag(), tag as Serializable)
+                                it.context.startActivity(intent)
+                            }
+                        }
+                    }
                 }
             }
         }

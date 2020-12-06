@@ -8,7 +8,6 @@ object RetrofitClient {
 
     fun getClient(baseUrl: String): Retrofit {
         if (retrofit == null) {
-            //Экземпляр, который использует интерфейс и API Builder, чтобы задать определение конечной точки URL для операций HTTP.
             retrofit = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())

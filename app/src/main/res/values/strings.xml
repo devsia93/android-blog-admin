@@ -11,4 +11,15 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="comments">Comments:</string>
+    <string name="authorization_token">Authorization token:</string>
+    <string name="save">save</string>
+    <string name="cancel">cancel</string>
+    <string name="search">Search</string>
+    <string name="check_comment">check comment</string>
+    <string name="add_post">add post</string>
+    <string name="post_body">Post body</string>
+    <string name="post_title">Post title</string>
+    <string name="edit">edit</string>
+    <string name="send">send</string>
+    <string name="delete">delete</string>
 </resources>
