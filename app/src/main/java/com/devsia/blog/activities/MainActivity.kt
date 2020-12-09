@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.View
@@ -16,6 +18,7 @@ import com.devsia.blog.R
 import com.devsia.blog.`interface`.RetrofitServices
 import com.devsia.blog.adapters.PostListAdapter
 import com.devsia.blog.common.Common
+import com.devsia.blog.helper.Helper
 import com.devsia.blog.models.Post
 import com.devsia.blog.models.Tag
 import com.devsia.blog.preference.Const
@@ -33,12 +36,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: PostListAdapter
     private lateinit var dialog: AlertDialog
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mService = Common.retrofitServices
+
+        handler = Handler(Looper.getMainLooper())
 
         initViews()
 
@@ -77,8 +84,7 @@ class MainActivity : AppCompatActivity() {
                 call: Call<MutableList<Tag>>,
                 response: Response<MutableList<Tag>>
             ) {
-                val pref = PreferenceHelper(baseContext)
-                pref.saveListTags(response.body() as List<Tag>)
+                PreferenceHelper.saveListTags(baseContext, response.body() as List<Tag>)
             }
         })
     }
@@ -102,34 +108,43 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         } else {
-
-            mService.getPostList().enqueue(object : Callback<MutableList<Post>> {
-                override fun onFailure(call: Call<MutableList<Post>>, t: Throwable) {
-                    Log.e("retrofit-module", "posts bad request: $t")
-                }
-
-                override fun onResponse(
-                    call: Call<MutableList<Post>>,
-                    response: Response<MutableList<Post>>
-                ) {
-                    inflateAdapter(response)
-                }
-            })
+            requestToGetPosts()
         }
     }
 
-    private fun inflateAdapter(response: Response<MutableList<Post>>) {
-        adapter = PostListAdapter(baseContext, response.body() as MutableList<Post>)
-        adapter.setHasStableIds(true)
-        adapter.notifyDataSetChanged()
+    private fun requestToGetPosts(isRefreshing: Boolean = false) {
+        mService.getPostList().enqueue(object : Callback<MutableList<Post>> {
+            override fun onFailure(call: Call<MutableList<Post>>, t: Throwable) {
+                Log.e("retrofit-module", "posts bad request: $t")
+            }
 
-        main_rv_posts_content.adapter = adapter
+            override fun onResponse(
+                call: Call<MutableList<Post>>,
+                response: Response<MutableList<Post>>
+            ) {
+                inflateAdapter(response, isRefreshing)
+            }
+        })
+    }
 
-        dialog.dismiss()
+    private fun inflateAdapter(
+        response: Response<MutableList<Post>>,
+        isRefreshing: Boolean = false
+    ) {
+        if (isRefreshing) {
+            adapter.updatePostsList(response.body() as MutableList<Post>)
+        } else {
+            adapter = PostListAdapter(baseContext, response.body() as MutableList<Post>)
+            adapter.setHasStableIds(true)
+            adapter.notifyDataSetChanged()
+
+            main_rv_posts_content.adapter = adapter
+
+            dialog.dismiss()
+        }
     }
 
     private fun initViews() {
-
         main_toolbar.title = "Developer Blog"
         main_toolbar.subtitle = "Ivan Serov"
         setSupportActionBar(main_toolbar)
@@ -138,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         main_rv_posts_content.setHasFixedSize(true)
 
         val tag: Tag? = intent.extras?.get(Const.Extra.extraTag()) as Tag?
-
+        //if activity has no intent with tag then not showing fb
         if (tag == null) {
             main_rv_posts_content.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -146,16 +161,36 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         } else main_fb_add.isVisible = false
+        //swipe refresh
+        main_swipe_refresh.setOnRefreshListener {
+            runnable = Runnable {
+                requestToGetPosts(isRefreshing = true)
+                main_swipe_refresh.isRefreshing = false
+            }
 
+            handler.postDelayed(runnable, 2000)
+        }
+        main_swipe_refresh.setProgressBackgroundColorSchemeColor(
+            Helper.getColorIdByAttr(
+                R.attr.colorSecondary,
+                theme
+            )
+        )
+        main_swipe_refresh.setColorSchemeColors(
+            Helper.getColorIdByAttr(
+                R.attr.colorOnSecondary,
+                theme
+            )
+        )
+        //recycler view
         layoutManager = LinearLayoutManager(this)
         main_rv_posts_content.layoutManager = layoutManager
         dialog = SpotsDialog.Builder().setCancelable(true).setContext(this).setTheme(R.style.Custom)
             .build()
     }
 
-    fun floatButtonOnClick(view: View){
+    fun floatButtonOnClick(view: View) {
         val intent = Intent(view.context, EditPostActivity::class.java)
         startActivity(intent)
     }
-
 }

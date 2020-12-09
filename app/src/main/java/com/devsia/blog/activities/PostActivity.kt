@@ -3,6 +3,8 @@ package com.devsia.blog.activities
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -34,12 +36,15 @@ class PostActivity : AppCompatActivity() {
     private lateinit var post: Post
     private lateinit var adapter: CommentListAdapter
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
 
         mService = Common.retrofitServices
+        handler = Handler(Looper.getMainLooper())
         post = intent.extras?.get(Const.Extra.extraPost()) as Post
 
         initViews()
@@ -76,6 +81,41 @@ class PostActivity : AppCompatActivity() {
         post_toolbar.subtitle = post.slug
         setSupportActionBar(post_toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        post_swipe_refresh.setOnRefreshListener {
+            runnable = Runnable {
+                requestToGetPostById()
+                post_swipe_refresh.isRefreshing = false
+            }
+
+            handler.postDelayed(runnable, 2000)
+        }
+        post_swipe_refresh.setProgressBackgroundColorSchemeColor(
+            Helper.getColorIdByAttr(
+                R.attr.colorSecondary,
+                theme
+            )
+        )
+        post_swipe_refresh.setColorSchemeColors(
+            Helper.getColorIdByAttr(
+                R.attr.colorOnSecondary,
+                theme
+            )
+        )
+    }
+
+    private fun requestToGetPostById() {
+        mService.getPostById(post.id).enqueue(object : Callback<Post>{
+            override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                post = response.body() as Post
+                initViews()
+                inflateViews()
+            }
+
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                Log.e("retrofit-module", "comments bad request: $t")
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -102,37 +142,39 @@ class PostActivity : AppCompatActivity() {
     }
 
     private fun deletePost() {
-        AlertDialog.Builder(this)
-            .setMessage("Please, confirm the delete")
-            .setPositiveButton("Confirm") { _, _ ->
-                val pref = PreferenceHelper(baseContext)
-                mService.deletePostById(pref.getToken()!!, post.id).enqueue(object : Callback<ResponseBody>{
-                    override fun onResponse(
-                        call: Call<ResponseBody>,
-                        response: Response<ResponseBody>
-                    ) {
-                        intent = Intent(baseContext, MainActivity::class.java)
-                        startActivity(intent)
-                    }
+        Helper.checkAvailableToken(this)
 
-                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        Log.e("retrofit-module", "delete bad request $t")
-                    }
-                })
-            }
-            .setNegativeButton("Cancel", null)
-            .create()
-            .show()
+        if (!PreferenceHelper.getToken(this).isNullOrEmpty())
+            AlertDialog.Builder(this)
+                .setMessage("Please, confirm the delete")
+                .setPositiveButton("Confirm") { _, _ ->
+                    mService.deletePostById(PreferenceHelper.getToken(this)!!, post.id)
+                        .enqueue(object : Callback<ResponseBody> {
+                            override fun onResponse(
+                                call: Call<ResponseBody>,
+                                response: Response<ResponseBody>
+                            ) {
+                                intent = Intent(baseContext, MainActivity::class.java)
+                                startActivity(intent)
+                            }
+
+                            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                                Log.e("retrofit-module", "delete bad request $t")
+                            }
+                        })
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
     }
 
     private fun inflateViews() {
         post_content_tv_title.text = post.title
         post_content_tv_body.text = post.body
-        tags_content_main_layout?.isVisible = !post.tags.isNullOrEmpty()
+        tags_content_main_layout.isVisible = !post.tags.isNullOrEmpty()
 
         if (!post.tags.isNullOrEmpty()) {
-            val pref = PreferenceHelper(baseContext)
-            val tags = pref.getListTags()
+            val tags = PreferenceHelper.getListTags(this)
 
             for (tagId in post.tags!!) {
                 for (tag in tags) {

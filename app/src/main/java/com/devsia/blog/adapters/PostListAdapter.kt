@@ -11,8 +11,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.devsia.blog.R
-import com.devsia.blog.activities.PostActivity
 import com.devsia.blog.activities.MainActivity
+import com.devsia.blog.activities.PostActivity
 import com.devsia.blog.helper.Helper
 import com.devsia.blog.models.Post
 import com.devsia.blog.models.Tag
@@ -24,7 +24,7 @@ import java.io.Serializable
 
 class PostListAdapter(
     private val context: Context,
-    private val postList: MutableList<Post>
+    private var postList: MutableList<Post>
 ) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTitle: TextView = itemView.findViewById(R.id.post_content_tv_title)
@@ -69,8 +69,7 @@ class PostListAdapter(
         holder.tagMainLayout.isVisible = isTagged
 
         if (isTagged) {
-            val pref = PreferenceHelper(context)
-            val tags: List<Tag> = pref.getListTags()
+            val tags: List<Tag> = PreferenceHelper.getListTags(context)
 
             for (tagId in listItem.tags!!) {
                 for (tag in tags) {
@@ -95,6 +94,12 @@ class PostListAdapter(
             holder.tvCommentsCount.isVisible = true
         holder.tvCommentsCount.text = "${context.getString(R.string.comments)} " +
                 "${listItem.comments!!.size}"
+    }
+
+    fun updatePostsList(list : MutableList<Post>){
+        postList.clear()
+        postList = list
+        this.notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int) = position

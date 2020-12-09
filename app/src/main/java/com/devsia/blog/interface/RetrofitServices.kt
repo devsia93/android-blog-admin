@@ -12,6 +12,25 @@ interface RetrofitServices {
     @GET("posts/")
     fun getPostList(): Call<MutableList<Post>>
 
+    @POST("posts/")
+    fun postPost(@Header("Authorization") token: String, @Body body: RequestBody): Call<Post>?
+
+    @GET("posts/{id}/")
+    fun getPostById(@Path("id") id: Int): Call<Post>
+
+    @PATCH("posts/{id}/")
+    fun patchPostById(
+        @Header("Authorization") token: String,
+        @Body body: RequestBody,
+        @Path("id") id: Int
+    ): Call<Post>?
+
+    @DELETE("posts/{id}/")
+    fun deletePostById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Call<ResponseBody>
+
     @GET("tags/{id}/posts/")
     fun getPostsByIdTag(@Path("id") id: Int): Call<MutableList<Post>>
 
@@ -27,13 +46,4 @@ interface RetrofitServices {
         @Header("Authorization") token: String,
         @Body body: RequestBody
     ): Call<Comment>?
-
-    @POST("posts/")
-    fun postPost(@Header("Authorization") token: String, @Body body: RequestBody): Call<Post>?
-
-    @PATCH("posts/{id}/")
-    fun patchPostById(@Header("Authorization") token: String, @Body body: RequestBody, @Path("id") id: Int): Call<Post>?
-
-    @DELETE("posts/{id}/")
-    fun deletePostById(@Header("Authorization") token: String, @Path("id") id: Int): Call<ResponseBody>
 }

@@ -14,35 +14,40 @@
         android:elevation="1dp"
         android:minHeight="?attr/actionBarSize" />
 
-    <RelativeLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/main.swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/main.rv_posts_content"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:layout_height="match_parent">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/main.fb_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="32dp"
-            android:contentDescription="@string/add_post"
-            android:elevation="2dp"
-            android:onClick="floatButtonOnClick"
-            android:src="@drawable/ic_baseline_add_24"
-            android:tint="?colorSecondary"
-            app:fabSize="auto"
-            app:layout_anchor="@id/main.rv_posts_content"
-            app:layout_anchorGravity="bottom|end|right" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/main.rv_posts_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-    </RelativeLayout>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/main.fb_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                android:contentDescription="@string/add_post"
+                android:elevation="2dp"
+                android:onClick="floatButtonOnClick"
+                android:src="@drawable/ic_baseline_add_24"
+                android:tint="?colorSecondary"
+                app:fabSize="auto"
+                app:layout_anchor="@id/main.rv_posts_content"
+                app:layout_anchorGravity="bottom|end|right" />
+
+        </RelativeLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

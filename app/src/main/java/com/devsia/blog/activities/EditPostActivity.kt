@@ -22,7 +22,6 @@ import retrofit2.Response
 
 class EditPostActivity : AppCompatActivity() {
 
-    private lateinit var mPref: PreferenceHelper
     private lateinit var mService: RetrofitServices
     private var isEditable = false
     private var postExtra: Post? = null
@@ -33,7 +32,6 @@ class EditPostActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_post)
 
         mService = Common.retrofitServices
-        mPref = PreferenceHelper(this)
 
         postExtra = intent?.extras?.get(Const.Extra.extraPost()) as Post?
         isEditable = postExtra != null
@@ -50,7 +48,7 @@ class EditPostActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
 
-        for (tag in mPref.getListTags()) {
+        for (tag in PreferenceHelper.getListTags(this)) {
             var isChecked = false
             if (tag.id in postExtra!!.tags!!.toIntArray()) {
                 isChecked = true
@@ -70,7 +68,7 @@ class EditPostActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
 
-        for (tag in mPref.getListTags())
+        for (tag in PreferenceHelper.getListTags(this))
             createChip(tag)
     }
 
@@ -106,19 +104,20 @@ class EditPostActivity : AppCompatActivity() {
     }
 
     private fun postToCreate() {
-        val pref = PreferenceHelper(baseContext)
-        val token = pref.getToken()
+        Helper.checkAvailableToken(this)
+        val token = PreferenceHelper.getToken(this)
         val (title, body, tags) = triple()
-        mService.postPost(token!!, Helper.createJsonRequestBody(title, body, tags))
-            ?.enqueue(object : Callback<Post> {
-                override fun onResponse(call: Call<Post>, response: Response<Post>) {
-                    startActivityWithPost(response.body() as Post)
-                }
+        if (!token.isNullOrEmpty())
+            mService.postPost(token, Helper.createJsonRequestBody(title, body, tags))
+                ?.enqueue(object : Callback<Post> {
+                    override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                        startActivityWithPost(response.body() as Post)
+                    }
 
-                override fun onFailure(call: Call<Post>, t: Throwable) {
-                    Log.e("retrofit-module", "[post] post bad request: $t")
-                }
-            })
+                    override fun onFailure(call: Call<Post>, t: Throwable) {
+                        Log.e("retrofit-module", "[post] post bad request: $t")
+                    }
+                })
     }
 
     private fun startActivityWithPost(post: Post) {
@@ -139,22 +138,23 @@ class EditPostActivity : AppCompatActivity() {
     }
 
     private fun patchToEdit() {
-        val pref = PreferenceHelper(baseContext)
-        val token = pref.getToken()
+        Helper.checkAvailableToken(this)
+        val token = PreferenceHelper.getToken(this)
         val (title, body, tags) = triple()
-        mService.patchPostById(
-            token!!,
-            Helper.createJsonRequestBody(title, body, tags),
-            postExtra!!.id
-        )?.enqueue(object : Callback<Post> {
-            override fun onResponse(call: Call<Post>, response: Response<Post>) {
-                startActivityWithPost(response.body() as Post)
-            }
+        if (!token.isNullOrEmpty())
+            mService.patchPostById(
+                token,
+                Helper.createJsonRequestBody(title, body, tags),
+                postExtra!!.id
+            )?.enqueue(object : Callback<Post> {
+                override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                    startActivityWithPost(response.body() as Post)
+                }
 
-            override fun onFailure(call: Call<Post>, t: Throwable) {
-                Log.e("retrofit-module", "patch post bad request: $t")
-            }
-        })
+                override fun onFailure(call: Call<Post>, t: Throwable) {
+                    Log.e("retrofit-module", "patch post bad request: $t")
+                }
+            })
     }
 
     override fun onBackPressed() {
