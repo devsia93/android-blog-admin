@@ -46,4 +46,10 @@ interface RetrofitServices {
         @Header("Authorization") token: String,
         @Body body: RequestBody
     ): Call<Comment>?
+
+    @DELETE("comments/{id}/")
+    fun deleteCommentById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int
+    ): Call<ResponseBody>
 }

@@ -22,4 +22,5 @@
     <string name="edit">edit</string>
     <string name="send">send</string>
     <string name="delete">delete</string>
+    <string name="approved_comment">approved comment</string>
 </resources>
