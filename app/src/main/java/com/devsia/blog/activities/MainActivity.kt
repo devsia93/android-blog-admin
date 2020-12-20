@@ -63,10 +63,12 @@ class MainActivity : AppCompatActivity() {
         v?.setBackgroundColor(Color.TRANSPARENT)
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+                adapter.filter(query)
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter(newText)
                 return true
             }
         })

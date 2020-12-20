@@ -20,12 +20,41 @@ import com.devsia.blog.preference.Const
 import com.devsia.blog.preference.PreferenceHelper
 import com.google.android.flexbox.FlexboxLayout
 import java.io.Serializable
+import java.util.*
 
 
 class PostListAdapter(
     private val context: Context,
-    private var postList: MutableList<Post>
+    private val postListMain: List<Post>
 ) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
+
+    private var postList = mutableListOf<Post>()
+
+    init {
+        postList.addAll(postListMain)
+    }
+
+    fun filter(textSearch: String?) {
+        val text = textSearch?.toLowerCase(Locale.ROOT)
+        if (text.isNullOrEmpty()) {
+            postList.clear()
+            postList.addAll(postListMain)
+        } else {
+            val result = mutableListOf<Post>()
+            for (post in postListMain) {
+                if (post.body.toLowerCase(Locale.ROOT).contains(text) || post.title.toLowerCase(
+                        Locale.ROOT
+                    ).contains(text)
+                ) {
+                    result.add(post)
+                }
+            }
+            postList.clear()
+            postList.addAll(result)
+        }
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTitle: TextView = itemView.findViewById(R.id.post_content_tv_title)
         val tvBody: TextView = itemView.findViewById(R.id.post_content_tv_body)
@@ -96,7 +125,7 @@ class PostListAdapter(
                 "${listItem.comments!!.size}"
     }
 
-    fun updatePostsList(list : MutableList<Post>){
+    fun updatePostsList(list: MutableList<Post>) {
         postList.clear()
         postList = list
         this.notifyDataSetChanged()
@@ -107,5 +136,4 @@ class PostListAdapter(
     override fun getItemCount() = postList.size
 
     override fun getItemId(position: Int) = position.toLong()
-
 }

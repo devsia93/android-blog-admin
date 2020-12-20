@@ -7,9 +7,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.devsia.blog.*
+import com.devsia.blog.helper.Helper
 import com.devsia.blog.models.CommentService
 import kotlinx.android.synthetic.main.item_comment.view.*
-
 
 class CommentListAdapter(
     private val commentsList: MutableList<CommentService>
@@ -26,7 +26,6 @@ class CommentListAdapter(
 
         fun bind(
             listItem: CommentService,
-            position: Int,
             selectedCommentService: MutableMap<CommentService, Boolean>
         ) {
             itemView.setOnLongClickListener {
@@ -35,8 +34,9 @@ class CommentListAdapter(
             }
 
             itemView.setOnClickListener {
-                if (selectedCommentService.isNotEmpty()) {
+                if (selectedCommentService.isNotEmpty() && Helper.isTouched) {
                     commonClick(it, listItem, selectedCommentService)
+                    Helper.isTouched = false //i know. it's very, very shit, but i'm newbie
                 }
             }
         }
@@ -67,7 +67,7 @@ class CommentListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val listItem = commentsList[position]
-        holder.bind(listItem, position, selectedCommentService)
+        holder.bind(listItem, selectedCommentService)
 
         holder.tvNick.text = listItem.author_name
         holder.tvDate.text = listItem.date_pub.substringBefore('T')
@@ -85,8 +85,6 @@ class CommentListAdapter(
 
     override fun getItemCount(): Int = commentsList.size
 
-    fun clearSelectedItems(){
-        selectedCommentService.clear()
-    }
+    fun clearSelectedItems() = selectedCommentService.clear()
 
 }

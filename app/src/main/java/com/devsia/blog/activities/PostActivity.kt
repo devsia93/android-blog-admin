@@ -56,7 +56,6 @@ class PostActivity : AppCompatActivity() {
         initViews()
 
         inflateViews()
-
     }
 
     private fun getAllCommentsList() {
@@ -110,6 +109,7 @@ class PostActivity : AppCompatActivity() {
                     override fun onClick(view: View?, position: Int) {
                         if (countSelectedComments > 0) {
                             commonClick(position)
+                            Helper.isTouched = true
                         }
                     }
 
@@ -168,6 +168,7 @@ class PostActivity : AppCompatActivity() {
         post_toolbar.title = "Post"
         post_toolbar.subtitle = post.slug
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
+        invalidateOptionsMenu()
     }
 
     private fun requestToGetPostById() {
@@ -194,7 +195,7 @@ class PostActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                if(countSelectedComments == 0) {
+                if (countSelectedComments == 0) {
                     val intent = Intent(baseContext, MainActivity::class.java)
                     startActivity(intent)
                 } else {
@@ -206,14 +207,18 @@ class PostActivity : AppCompatActivity() {
                 }
             }
             R.id.action_edit -> startEditPostActivity()
-            R.id.action_delete -> showDeletePostDialog()
-            R.id.action_delete_comment -> showDeleteCommentsDialog()
-            R.id.action_approve_comment -> approveComment()
+            R.id.action_delete -> {
+                if (countSelectedComments == 0)
+                    showDeletePostDialog()
+                else showDeleteCommentsDialog()
+            }
+            R.id.action_disapprove_comment -> changeApproveStatusComment(false)
+            R.id.action_approve_comment -> changeApproveStatusComment(true)
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun approveComment() {
+    private fun changeApproveStatusComment(status: Boolean) {
         setDefaultToolbar()
         Helper.checkAvailableToken(baseContext)
         val token = PreferenceHelper.getToken(baseContext)
@@ -222,7 +227,7 @@ class PostActivity : AppCompatActivity() {
                 mService.patchCommentById(
                     comment.key.id,
                     token,
-                    Helper.createJsonRequestBody("approved_comment" to true)
+                    Helper.createJsonRequestBody("approved_comment" to status)
                 )?.enqueue(object : Callback<Comment> {
                     override fun onResponse(
                         call: Call<Comment>,
@@ -231,7 +236,7 @@ class PostActivity : AppCompatActivity() {
                         val currentComment: CommentService? =
                             commentsService.find { it.id == (response.body() as Comment).id }
                         val indexCurrentComment = commentsService.indexOf(currentComment)
-                        commentsService[indexCurrentComment].approved_comment = true
+                        commentsService[indexCurrentComment].approved_comment = status
                         adapter.notifyItemChanged(indexCurrentComment)
                     }
 

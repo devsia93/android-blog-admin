@@ -19,7 +19,11 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 
 class Helper {
+
     companion object Builder {
+
+        var isTouched = false
+
         fun getCreatedChip(
             fbView: FlexboxLayout,
             tag: Tag,

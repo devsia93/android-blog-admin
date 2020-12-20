@@ -12,15 +12,16 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="comments">Comments:</string>
     <string name="authorization_token">Authorization token:</string>
-    <string name="save">save</string>
-    <string name="cancel">cancel</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
     <string name="search">Search</string>
-    <string name="check_comment">check comment</string>
-    <string name="add_post">add post</string>
+    <string name="check_comment">Check comment</string>
+    <string name="add_post">Add post</string>
     <string name="post_body">Post body</string>
     <string name="post_title">Post title</string>
-    <string name="edit">edit</string>
-    <string name="send">send</string>
-    <string name="delete">delete</string>
-    <string name="approved_comment">approved comment</string>
+    <string name="edit">Edit</string>
+    <string name="send">Send</string>
+    <string name="delete">Delete</string>
+    <string name="approved_comment">Visibility On</string>
+    <string name="not_approved_comment">Visibility Off</string>
 </resources>

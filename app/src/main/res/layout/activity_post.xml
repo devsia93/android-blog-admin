@@ -14,60 +14,61 @@
         android:minHeight="?attr/actionBarSize" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/post.swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/post.swipe_refresh">
+        android:layout_height="match_parent">
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@+id/activity_post.ll_content"
-            android:layout_width="match_parent"
+        <ScrollView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:orientation="vertical">
 
-            <include layout="@layout/layout_post_content_view" />
-
-            <include
-                layout="@layout/layout_tags_content_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp" />
-
-            <TextView
-                android:id="@+id/activity_post.tv_comments"
+            <LinearLayout
+                android:id="@+id/activity_post.ll_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/comments"
-                android:textSize="16sp"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="16dp"
-                android:descendantFocusability="blocksDescendants"
-                android:paddingBottom="16dp">
+                <include layout="@layout/layout_post_content_view" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/activity_post.rv_comments"
+                <include
+                    layout="@layout/layout_tags_content_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp" />
+
+                <TextView
+                    android:id="@+id/activity_post.tv_comments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/comments"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:nestedScrollingEnabled="false" />
+                    android:layout_marginBottom="16dp"
+                    android:descendantFocusability="blocksDescendants"
+                    android:paddingBottom="16dp">
 
-            </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/activity_post.rv_comments"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:nestedScrollingEnabled="false"
+                        android:splitMotionEvents="false" />
 
-        </LinearLayout>
+                </RelativeLayout>
 
-    </ScrollView>
+            </LinearLayout>
+
+        </ScrollView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
