@@ -3,13 +3,17 @@ package com.devsia.blog.adapters
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.devsia.blog.R
 import com.devsia.blog.activities.MainActivity
 import com.devsia.blog.activities.PostActivity
@@ -61,6 +65,7 @@ class PostListAdapter(
         val tvCommentsCount: TextView = itemView.findViewById(R.id.post_card_tv_comments_count)
         val tagMainLayout = itemView.findViewById<LinearLayout>(R.id.tags_content_main_layout)!!
         val fbView = itemView.findViewById<FlexboxLayout>(R.id.tags_content_fb_view)!!
+        val ivTitle = itemView.findViewById<ImageView>(R.id.item_post_iv_title)!!
 
 
         fun bind(listItem: Post) {
@@ -88,6 +93,16 @@ class PostListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val listItem = postList[position]
         holder.bind(listItem)
+
+        if (!listItem.image.isNullOrEmpty()) {
+            holder.ivTitle.isVisible = true
+            Glide
+                .with(holder.itemView.context)
+                .load(listItem.image)
+                .centerCrop()
+                .placeholder(ColorDrawable(Color.GRAY))
+                .into(holder.ivTitle)
+        } else holder.ivTitle.visibility = View.GONE
 
         holder.tvTitle.text = listItem.title
         holder.tvBody.text = if (listItem.body.length > Const.Setting.countCharsForPost())
@@ -119,10 +134,10 @@ class PostListAdapter(
             }
         }
 
-        if (!listItem.comments.isNullOrEmpty())
+        if (listItem.comment_count > 0)
             holder.tvCommentsCount.isVisible = true
         holder.tvCommentsCount.text = "${context.getString(R.string.comments)} " +
-                "${listItem.comments!!.size}"
+                listItem.comment_count
     }
 
     fun updatePostsList(list: MutableList<Post>) {
@@ -132,6 +147,10 @@ class PostListAdapter(
     }
 
     override fun getItemViewType(position: Int) = position
+
+    override fun setHasStableIds(hasStableIds: Boolean) {
+        super.setHasStableIds(true)
+    }
 
     override fun getItemCount() = postList.size
 

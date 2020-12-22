@@ -347,7 +347,7 @@ class PostActivity : AppCompatActivity() {
             }
         }
 
-        if (!post.comments.isNullOrEmpty()) {
+        if (post.comment_count>0) {
             mService = Common.retrofitServices
             activity_post_tv_comments.isVisible = true
             getAllCommentsList()

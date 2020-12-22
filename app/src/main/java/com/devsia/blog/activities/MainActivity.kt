@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mService: RetrofitServices
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var searchView: SearchView
     private lateinit var adapter: PostListAdapter
     private lateinit var dialog: AlertDialog
     private lateinit var handler: Handler
@@ -57,13 +59,24 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main_toolbar_menu, menu)
 
         val search = menu!!.findItem(R.id.action_search)
-        val searchView = search?.actionView as SearchView?
-        searchView?.queryHint = resources.getString(R.string.search)
-        val v: View? = searchView?.findViewById(R.id.search_plate)
-        v?.setBackgroundColor(Color.TRANSPARENT)
-        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView = search.actionView as SearchView
+        searchView.queryHint = resources.getString(R.string.search)
+
+        val searchFrameId =
+            searchView.context.resources.getIdentifier("android:id/search_edit_frame", null, null)
+        val searchFrame = searchView.findViewById<View>(searchFrameId)
+        searchFrame.background = ContextCompat.getDrawable(this, R.drawable.bg_searchview)
+
+        val searchPlateId =
+            searchView.context.resources.getIdentifier("android:id/search_plate", null, null)
+        val searchPlate = searchView.findViewById<View>(searchPlateId)
+        searchPlate!!.setBackgroundColor(Color.TRANSPARENT)
+        searchPlate.background = null
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 adapter.filter(query)
+                searchView.clearFocus()
                 return true
             }
 
@@ -159,13 +172,20 @@ class MainActivity : AppCompatActivity() {
         if (tag == null) {
             main_rv_posts_content.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (dy < 0 && !main_fb_add.isShown) main_fb_add.show() else if (dy > 0 && main_fb_add.isShown) main_fb_add.hide()
+                    if (dy < 0 && !main_fb_add.isShown) main_fb_add.show() else if (dy > 0 && main_fb_add.isShown) {
+                        main_fb_add.hide()
+                        searchView.clearFocus()
+                    }
                 }
             })
         } else main_fb_add.isVisible = false
         //swipe refresh
         main_swipe_refresh.setOnRefreshListener {
             runnable = Runnable {
+                if (!searchView.isIconified) {
+                    searchView.isIconified = true
+                    searchView.clearFocus()
+                }
                 requestToGetPosts(isRefreshing = true)
                 main_swipe_refresh.isRefreshing = false
             }

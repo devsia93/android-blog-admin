@@ -9,5 +9,6 @@ data class Post(
     val body: String,
     val tags: List<Int>? = null,
     val date_pub: String,
-    val comments: List<Int>? = null,
+    val comment_count: Int,
+    val image: String? = null
 ) : Serializable
